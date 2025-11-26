@@ -51,7 +51,7 @@ type ApiTests(logger: ITestOutputHelper) =
             config.SearchEngineId <- searchEngineId
 
             let client = Client "https://www.googleapis.com/customsearch/v1"
-            let googleClient = GoogleClient(client.Client, config)
+            let googleClient = GoogleClient(client.Client, Options.Create config)
 
             // Act
             let! response = googleClient.SearchFull "test query" CancellationToken.None
@@ -119,7 +119,7 @@ type ApiTests(logger: ITestOutputHelper) =
             googleConfig.SearchEngineId <- searchEngineId
 
             let googleHttpClient = Client "https://www.googleapis.com/customsearch/v1"
-            let googleClient = GoogleClient(googleHttpClient.Client, googleConfig)
+            let googleClient = GoogleClient(googleHttpClient.Client, Options.Create googleConfig)
 
             let llmConfig = LiteLLMConfig()
             llmConfig.Uri <- "http://localhost:4000"

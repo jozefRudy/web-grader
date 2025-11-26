@@ -23,7 +23,10 @@ type SearchResponse = {
     searchInformation: SearchInformation option
 }
 
-type GoogleClient(client: HttpClient, config: GoogleConfig) =
+open Microsoft.Extensions.Options
+
+type GoogleClient(client: HttpClient, config: IOptions<GoogleConfig>) =
+    let config = config.Value
 
     member this.SearchFull (query: string) (ct: CancellationToken) =
         taskResult {
