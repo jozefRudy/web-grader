@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Views/AeoViews.fs" />
+    <Compile Include="Controllers/AeoController.fs" />
     <Compile Include="WeatherForecast.fs" />
     <Compile Include="Controllers/WeatherForecastController.fs" />
     <Compile Include="Program.fs" />
@@ -16,6 +18,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WebGrader.Core\WebGrader.Core.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Giraffe" Version="8.2.0" />
+    <PackageReference Include="Giraffe.ViewEngine" Version="1.4.0" />
   </ItemGroup>
 
 </Project>

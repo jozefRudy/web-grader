@@ -13,6 +13,7 @@
   <ItemGroup>
     <!-- Order matters in F#! -->
     <Compile Include="Utils.fs" />
+    <Compile Include="Models/AeoModels.fs" />
     <Compile Include="Config/GoogleConfig.fs" />
     <Compile Include="Config/LiteLLMConfig.fs" />
     <Compile Include="Api/LoggingHandler.fs" />
