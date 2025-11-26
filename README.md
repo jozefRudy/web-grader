@@ -35,10 +35,6 @@ Set the following environment variables before running:
 export Google__ApiKey="your_google_api_key"
 export Google__SearchEngineId="your_search_engine_id"
 
-# LiteLLM Configuration
-export LiteLLM__Uri="http://localhost:4000"
-export LiteLLM__Model="gpt-5-mini"
-
 # OpenAI API Key (for LiteLLM)
 export OPENAI_API_KEY="your_openai_api_key"
 ```
@@ -47,8 +43,6 @@ export OPENAI_API_KEY="your_openai_api_key"
 ```bash
 set -x Google__ApiKey "your_google_api_key"
 set -x Google__SearchEngineId "your_search_engine_id"
-set -x LiteLLM__Uri "http://localhost:4000"
-set -x LiteLLM__Model "gpt-5-mini"
 set -x OPENAI_API_KEY "your_openai_api_key"
 ```
 
@@ -133,46 +127,7 @@ dotnet test
 - **Benefits**: Can extract insights from unstructured text, adapts to different industries
 - **Trade-off**: Non-deterministic, requires careful prompt engineering
 
-## Known Limitations & Future Improvements
-
-### Current Shortcomings
-
-1. **Score Accuracy**
-   - LLM-generated scores are estimates, not based on precise metrics
-   - No baseline or historical comparison data
-   - Scores may vary between runs for the same input
-
-2. **Data Quality**
-   - Limited to top 10 Google results per query (API limitation)
-   - No caching - same queries repeated for same company
-   - No validation of competitor names or mention counts
-
-3. **Error Handling**
-   - Single API failure causes entire analysis to fail
-   - No retry logic for transient failures
-   - No graceful degradation with partial results
-
-4. **LLM Response Parsing**
-   - Strict JSON parsing can fail if LLM deviates from schema
-   - `topSources` array format is fragile
-   - No schema validation before parsing
-
-5. **Rate Limiting**
-   - 11 queries per analysis can exhaust free tier quickly
-   - No rate limiting or queue management for multiple users
-   - No query result caching
-
-6. **Scalability**
-   - Synchronous request processing (blocks during 30-60s analysis)
-   - No background job processing
-   - No database for storing historical reports
-
-7. **Testing**
-   - Limited test coverage
-   - No integration tests for full flow
-   - No mock data for offline testing
-
-### Potential Improvements
+## Future Improvements
 
 **Short-term:**
 - Add caching layer (Redis) for Google search results
