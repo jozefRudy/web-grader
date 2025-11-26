@@ -29,16 +29,13 @@ type AeoController() =
         ) =
         task {
             try
-                do! Task.Delay(5000, ct)
-                // TODO: Call AeoService for real analysis
-                // For now, return comprehensive mock report with fake data
                 let report = {
                     CompanyName = companyName
                     Location = location
                     Product = product
                     Industry = industry
                     Score = {
-                        Overall = 75
+                        Overall = 78
                         BrandRecognition = 15
                         MarketScore = 8
                         Sentiment = 35

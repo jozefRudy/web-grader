@@ -228,11 +228,12 @@ let reportFragment (report: AeoReport) =
                     if not report.MarketCompetitionDetails.CompetitorMentions.IsEmpty then
                         div [ _class "mb-4" ] [
                             h4 [ _class "font-semibold mb-2" ] [ str "Competitor Mentions:" ]
-                            div [ _class "grid grid-cols-2 md:grid-cols-3 gap-2" ] [
+                            div [ _class "space-y-2" ] [
                                 for (competitor, mentions) in
                                     Map.toSeq report.MarketCompetitionDetails.CompetitorMentions do
-                                    div [ _class "bg-white p-2 rounded shadow-sm" ] [
-                                        str $"{competitor}: {mentions} mentions"
+                                    div [ _class "flex justify-between bg-white p-2 rounded" ] [
+                                        span [] [ str competitor ]
+                                        span [ _class "font-semibold" ] [ str $"{mentions} mentions" ]
                                     ]
                             ]
                         ]
