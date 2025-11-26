@@ -41,7 +41,7 @@ module Program =
 
             builder.Services.AddConfigurableResilientClient<Api.GoogleClient.GoogleClient>(
                 (fun sp c ->
-                    c.BaseAddress <- Uri "https://www.googleapis.com/customsearch/v1"
+                    c.BaseAddress <- Uri "https://www.googleapis.com/customsearch/v1/"
                     c.Timeout <- timeout
                 ),
                 configureResilience = (fun options -> configureStandardTimeouts timeout options)
