@@ -126,25 +126,54 @@ let reportFragment (report: AeoReport) =
 
             // Score cards
             div [ _class "grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" ] [
-                div [ _class "stat bg-blue-600 text-white rounded-lg p-4 shadow-md" ] [
+                div [ _class "stat bg-blue-700 text-white rounded-lg p-4 shadow-md" ] [
                     div [ _class "stat-title text-sm text-blue-100" ] [ str "Overall Score" ]
                     div [ _class "stat-value text-3xl font-bold" ] [ str (string report.Score.Overall) ]
                     div [ _class "stat-desc text-blue-200" ] [ str "out of 100" ]
                 ]
-                div [ _class "stat bg-green-600 text-white rounded-lg p-4 shadow-md" ] [
-                    div [ _class "stat-title text-sm text-green-100" ] [ str "Brand Recognition" ]
+                div [ _class "stat bg-green-50 text-green-900 rounded-lg p-4 shadow-md" ] [
+                    div [ _class "stat-title text-sm text-green-700" ] [ str "Brand Recognition" ]
                     div [ _class "stat-value text-3xl font-bold" ] [ str (string report.Score.BrandRecognition) ]
-                    div [ _class "stat-desc text-green-200" ] [ str "out of 20" ]
+                    div [ _class "stat-desc text-green-600" ] [ str "out of 20" ]
                 ]
-                div [ _class "stat bg-purple-600 text-white rounded-lg p-4 shadow-md" ] [
-                    div [ _class "stat-title text-sm text-purple-100" ] [ str "Market Score" ]
+                div [ _class "stat bg-blue-50 text-blue-900 rounded-lg p-4 shadow-md" ] [
+                    div [ _class "stat-title text-sm text-blue-700" ] [ str "Market Score" ]
                     div [ _class "stat-value text-3xl font-bold" ] [ str (string report.Score.MarketScore) ]
-                    div [ _class "stat-desc text-purple-200" ] [ str "out of 10" ]
+                    div [ _class "stat-desc text-blue-600" ] [ str "out of 10" ]
                 ]
-                div [ _class "stat bg-orange-600 text-white rounded-lg p-4 shadow-md" ] [
-                    div [ _class "stat-title text-sm text-orange-100" ] [ str "Sentiment" ]
+                div [ _class "stat bg-orange-50 text-orange-900 rounded-lg p-4 shadow-md" ] [
+                    div [ _class "stat-title text-sm text-orange-700" ] [ str "Sentiment" ]
                     div [ _class "stat-value text-3xl font-bold" ] [ str (string report.Score.Sentiment) ]
-                    div [ _class "stat-desc text-orange-200" ] [ str "out of 40" ]
+                    div [ _class "stat-desc text-orange-600" ] [ str "out of 40" ]
+                ]
+            ]
+
+            // Source Analysis
+            div [ _class "mb-8" ] [
+                h3 [ _class "text-xl font-bold mb-4 text-purple-700" ] [ str "Source Analysis" ]
+                div [ _class "bg-purple-50 p-4 rounded-lg" ] [
+                    div [ _class "grid grid-cols-2 md:grid-cols-3 gap-4 mb-4" ] [
+                        div [ _class "text-center" ] [
+                            div [ _class "text-2xl font-bold text-purple-600" ] [ str (string report.SourceAnalysis.TotalSources) ]
+                            div [ _class "text-sm text-gray-600" ] [ str "Total Sources" ]
+                        ]
+                        div [ _class "text-center" ] [
+                            div [ _class "text-2xl font-bold text-purple-600" ] [ str $"{report.SourceAnalysis.SourceDiversity}/10" ]
+                            div [ _class "text-sm text-gray-600" ] [ str "Source Diversity" ]
+                        ]
+                        div [ _class "text-center md:col-span-1" ] [
+                            div [ _class "text-sm text-gray-600" ] [ str "Top Sources" ]
+                        ]
+                    ]
+
+                    if not report.SourceAnalysis.TopSources.IsEmpty then
+                        div [ _class "space-y-2" ] [
+                            for (source, count) in report.SourceAnalysis.TopSources |> List.take 5 do
+                                div [ _class "flex justify-between bg-white p-2 rounded" ] [
+                                    span [] [ str source ]
+                                    span [ _class "font-semibold" ] [ str $"{count} mentions" ]
+                                ]
+                        ]
                 ]
             ]
 
@@ -175,7 +204,7 @@ let reportFragment (report: AeoReport) =
 
             // Market Competition
             div [ _class "mb-8" ] [
-                h3 [ _class "text-xl font-bold mb-4 text-blue-700" ] [ str "Market Competition Analysis" ]
+                h3 [ _class "text-xl font-bold mb-4 text-blue-700" ] [ str "Market Score Analysis" ]
                 div [ _class "bg-blue-50 p-4 rounded-lg" ] [
                     div [ _class "mb-4" ] [
                         div [ _class "text-lg" ] [
@@ -200,7 +229,7 @@ let reportFragment (report: AeoReport) =
                             h4 [ _class "font-semibold mb-2" ] [ str "Common Comparison Topics:" ]
                             div [ _class "flex flex-wrap gap-2" ] [
                                 for topic in report.MarketCompetitionDetails.CommonComparisonTopics do
-                                    span [ _class "badge badge-primary" ] [ str topic ]
+                                    span [ _class "badge bg-blue-200 text-blue-900 border-none" ] [ str topic ]
                             ]
                         ]
 
@@ -245,35 +274,6 @@ let reportFragment (report: AeoReport) =
                             ]
                         ]
                     ]
-                ]
-            ]
-
-            // Source Analysis
-            div [ _class "mb-8" ] [
-                h3 [ _class "text-xl font-bold mb-4 text-purple-700" ] [ str "Source Analysis" ]
-                div [ _class "bg-purple-50 p-4 rounded-lg" ] [
-                    div [ _class "grid grid-cols-2 md:grid-cols-3 gap-4 mb-4" ] [
-                        div [ _class "text-center" ] [
-                            div [ _class "text-2xl font-bold text-purple-600" ] [ str (string report.SourceAnalysis.TotalSources) ]
-                            div [ _class "text-sm text-gray-600" ] [ str "Total Sources" ]
-                        ]
-                        div [ _class "text-center" ] [
-                            div [ _class "text-2xl font-bold text-purple-600" ] [ str $"{report.SourceAnalysis.SourceDiversity}/10" ]
-                            div [ _class "text-sm text-gray-600" ] [ str "Source Diversity" ]
-                        ]
-                        div [ _class "text-center md:col-span-1" ] [
-                            div [ _class "text-sm text-gray-600" ] [ str "Top Sources" ]
-                        ]
-                    ]
-
-                    if not report.SourceAnalysis.TopSources.IsEmpty then
-                        div [ _class "space-y-2" ] [
-                            for (source, count) in report.SourceAnalysis.TopSources |> List.take 5 do
-                                div [ _class "flex justify-between bg-white p-2 rounded" ] [
-                                    span [] [ str source ]
-                                    span [ _class "font-semibold" ] [ str $"{count} mentions" ]
-                                ]
-                        ]
                 ]
             ]
 
