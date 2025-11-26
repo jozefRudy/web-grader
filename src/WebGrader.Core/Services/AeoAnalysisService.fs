@@ -106,6 +106,77 @@ CRITICAL FORMATTING RULES - FOLLOW EXACTLY:
 
 Return ONLY the JSON object starting with {{ and ending with }}."""
     
+    member private this.BuildDirectLLMPrompt(companyName: string, location: string, product: string, industry: string) =
+        $"""You are an AEO (Answer Engine Optimization) analyst. Based on your knowledge (not external searches), provide a comprehensive analysis of {companyName}.
+
+Company: {companyName}
+Location: {location}
+Product/Service: {product}
+Industry: {industry}
+
+TASK: Analyze this company based ONLY on your training data and general business knowledge. This is a test of how much LLMs know about businesses without real-time data.
+
+Please provide a JSON response with the following structure:
+{{
+  "brandRecognitionScore": 15,
+  "marketScore": 8,
+  "sentimentScore": 35,
+  "dataSource": "LLM Training Data (no external search)",
+  "knowledgeCutoff": "Specify your knowledge cutoff date",
+  "confidenceLevel": 65,
+  "competitors": [
+    {{"name": "Competitor A", "shareOfVoice": 25.5}}
+  ],
+  "strengths": ["strength1", "strength2"],
+  "weaknesses": ["weakness1", "weakness2"],
+  "summary": "Executive summary here. Note: This analysis is based on LLM training data only, not real-time search.",
+  "brandRecognitionDetails": {{
+    "recognitionScore": 82,
+    "marketPosition": "Challenger",
+    "confidenceLevel": 85,
+    "sourceDiversity": 0
+  }},
+  "marketCompetitionDetails": {{
+    "totalMentions": 0,
+    "competitorMentions": {{}},
+    "commonComparisonTopics": ["pricing", "features"],
+    "marketTrends": ["trend1", "trend2"]
+  }},
+  "sentimentDetails": {{
+    "overallSentiment": 68,
+    "positiveFactors": ["factor1"],
+    "negativeFactors": ["factor1"],
+    "neutralMentions": 0
+  }},
+  "sourceAnalysis": {{
+    "totalSources": 0,
+    "topSources": [
+      ["llm-training-data", 0],
+      ["general-knowledge", 0],
+      ["industry-patterns", 0],
+      ["business-common-sense", 0],
+      ["historical-data", 0]
+    ],
+    "sourceDiversity": 0
+  }},
+  "keyInsights": {{
+    "primaryStrengths": ["strength1"],
+    "criticalWeaknesses": ["weakness1"],
+    "marketOpportunities": ["opportunity1"],
+    "competitiveAdvantages": ["advantage1"]
+  }}
+}}
+
+CRITICAL FORMATTING RULES - FOLLOW EXACTLY:
+1. Return ONLY valid JSON - no markdown code blocks, no explanatory text
+2. All scores must be integers between 0-100
+3. "topSources" MUST be an array of exactly 5 arrays
+4. Each inner array MUST have EXACTLY 2 elements: [string, number]
+5. Be honest about confidence levels - if you don't know the company well, reflect that in scores
+6. In your summary, clearly state this is based on training data only
+
+Return ONLY the JSON object starting with {{ and ending with }}."""
+    
     member this.GatherSearchData(companyName: string, location: string, product: string, industry: string, ct: CancellationToken) =
         taskResult {
             // First 5 queries in parallel
@@ -144,12 +215,20 @@ Return ONLY the JSON object starting with {{ and ending with }}."""
             |}
         }
     
-    member this.GenerateReport(companyName: string, location: string, product: string, industry: string, ct: CancellationToken) =
+    member this.GenerateReport(companyName: string, location: string, product: string, industry: string, mode: AnalysisMode, ct: CancellationToken) =
         taskResult {
-            let! searchData = this.GatherSearchData(companyName, location, product, industry, ct)
-            
-            // Build prompt with search data
-            let prompt = this.BuildAnalysisPrompt(companyName, location, product, industry, searchData)
+            // Build prompt based on mode
+            let! prompt = 
+                match mode with
+                | AnalysisMode.GoogleSearch ->
+                    taskResult {
+                        let! searchData = this.GatherSearchData(companyName, location, product, industry, ct)
+                        return this.BuildAnalysisPrompt(companyName, location, product, industry, searchData)
+                    }
+                | AnalysisMode.DirectLLM ->
+                    taskResult {
+                        return this.BuildDirectLLMPrompt(companyName, location, product, industry)
+                    }
             
             // Call LLM for analysis
             let! llmResponse = llmClient.Chat(prompt, ct)
@@ -164,6 +243,7 @@ Return ONLY the JSON object starting with {{ and ending with }}."""
                         Location = location
                         Product = product
                         Industry = industry
+                        Mode = mode
                         Score = 
                             let brandScore100 = json.GetProperty("brandRecognitionScore").GetInt32()
                             let marketScore100 = json.GetProperty("marketScore").GetInt32()

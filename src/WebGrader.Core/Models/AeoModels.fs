@@ -2,11 +2,16 @@ module Models.AeoModels
 
 open System
 
+type AnalysisMode = 
+    | GoogleSearch  // Real-time Google Search + LLM synthesis
+    | DirectLLM     // Pure LLM knowledge test (no external search)
+
 type AnalyzeRequest = {
     CompanyName: string
     Location: string
     Product: string
     Industry: string
+    Mode: AnalysisMode
 }
 
 type AeoScore = {
@@ -60,6 +65,7 @@ type AeoReport = {
     Location: string
     Product: string
     Industry: string
+    Mode: AnalysisMode
     Score: AeoScore
     Competitors: CompetitorInfo list
     Strengths: string list

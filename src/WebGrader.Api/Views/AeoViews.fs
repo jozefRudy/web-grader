@@ -102,6 +102,44 @@ let formView () =
                             ]
                         ]
 
+                        // Analysis Mode Selector
+                        div [ _class "form-control" ] [
+                            label [ _class "label" ] [ 
+                                span [ _class "label-text font-semibold" ] [ str "Analysis Mode *" ] 
+                            ]
+                            div [ _class "flex flex-col gap-2" ] [
+                                label [ _class "label cursor-pointer justify-start gap-3 bg-base-200 p-3 rounded-lg" ] [
+                                    input [ 
+                                        _type "radio"
+                                        _name "mode"
+                                        _value "google"
+                                        attr "checked" ""
+                                        _class "radio radio-primary"
+                                    ]
+                                    div [] [
+                                        div [ _class "font-semibold" ] [ str "Google Search + LLM" ]
+                                        div [ _class "text-sm text-gray-600" ] [ 
+                                            str "Real-time Google searches (11 queries) + AI synthesis"
+                                        ]
+                                    ]
+                                ]
+                                label [ _class "label cursor-pointer justify-start gap-3 bg-base-200 p-3 rounded-lg" ] [
+                                    input [ 
+                                        _type "radio"
+                                        _name "mode"
+                                        _value "direct"
+                                        _class "radio radio-primary"
+                                    ]
+                                    div [] [
+                                        div [ _class "font-semibold" ] [ str "Direct LLM Knowledge" ]
+                                        div [ _class "text-sm text-gray-600" ] [ 
+                                            str "Test what LLM knows from training data (no external search)"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+
                         button [
                             _type "submit"
                             _id "analyze-btn"
@@ -123,8 +161,21 @@ let reportFragment (report: AeoReport) =
         div [ _class "card-body" ] [
             h2 [ _class "card-title text-2xl mb-4" ] [ str $"AEO Analysis: {report.CompanyName}" ]
 
-            div [ _class "text-sm text-gray-600 mb-6" ] [
+            div [ _class "text-sm text-gray-600 mb-2" ] [
                 str $"Location: {report.Location} | Product: {report.Product} | Industry: {report.Industry}"
+            ]
+            
+            // Mode indicator badge
+            div [ _class "mb-4" ] [
+                match report.Mode with
+                | AnalysisMode.GoogleSearch ->
+                    span [ _class "badge badge-primary gap-2" ] [
+                        str "🔍 Google Search + LLM"
+                    ]
+                | AnalysisMode.DirectLLM ->
+                    span [ _class "badge badge-secondary gap-2" ] [
+                        str "🤖 Direct LLM Knowledge"
+                    ]
             ]
 
             // Score cards

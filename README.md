@@ -94,14 +94,38 @@ cd src
 dotnet test
 ```
 
-## How It Works
+## Analysis Modes
 
-1. **User submits form** with company name, location, product, and industry
-2. **Google Search phase**: Executes 11 parallel queries across three categories:
+The application supports two analysis modes:
+
+### 🔍 Google Search + LLM (Default)
+- **Purpose**: Comprehensive real-time brand analysis
+- **Process**: 
+  1. Executes 11 parallel Google searches across Brand Recognition, Market Competition, and Sentiment categories
+  2. LLM synthesizes ~110 search results into structured insights
+  3. Scores based on actual real-time search data
+- **Use case**: Production AEO analysis, current market positioning
+- **API Usage**: Requires Google Custom Search API and OpenAI API
+
+### 🤖 Direct LLM Knowledge
+- **Purpose**: Test what LLMs know about businesses from training data alone
+- **Process**: 
+  1. Skips Google searches entirely
+  2. LLM analyzes based only on its training knowledge
+  3. Scores reflect LLM's confidence and knowledge depth
+- **Use case**: Benchmark LLM business knowledge, no Google API quota usage
+- **API Usage**: Only requires OpenAI API
+
+**Key Insight**: Comparing both modes reveals the gap between LLM training data and real-time search results. This dual-mode approach was inspired by the realization that the original assignment goal was to test how much LLMs actually know about specific companies without external data sources.
+
+## How It Works (Google Search Mode)
+
+1. **User submits form** with company name, location, product, industry, and analysis mode
+2. **Google Search phase** (if enabled): Executes 11 parallel queries across three categories:
    - **Brand Recognition** (4 queries): Direct mentions, industry context, "best product" rankings, reviews
    - **Market Competition** (3 queries): Competitor comparisons, alternatives, top companies
    - **Sentiment Analysis** (4 queries): Reviews, complaints, Reddit discussions, testimonials
-3. **LLM Analysis phase**: Feeds all search results to LLM with structured prompt
+3. **LLM Analysis phase**: Feeds search results (or uses training data only) to LLM with structured prompt
 4. **Report Generation**: LLM returns JSON with scores, insights, and recommendations
 5. **Score Normalization**: Converts LLM's 0-100 scores to weighted components:
    - Brand Recognition: 0-20 (20% weight)

@@ -14,6 +14,7 @@ open Api.GoogleClient
 open Api.LLMClient
 open Config.Google
 open Config.LiteLLM
+open Models.AeoModels
 open Services.AeoAnalysisService
 open System.Threading
 
@@ -130,10 +131,14 @@ type ApiTests(logger: ITestOutputHelper) =
 
             let service = AeoAnalysisService(googleClient, llmClient)
 
-            let request =
-                "Martus Solutions", "United States", "CRM Software", "B2B SaaS", CancellationToken.None
-
-            let! report = service.GenerateReport request
+            let! report = service.GenerateReport(
+                "Martus Solutions", 
+                "United States", 
+                "CRM Software", 
+                "B2B SaaS", 
+                AnalysisMode.GoogleSearch,
+                CancellationToken.None
+            )
 
             let responseStr = sprintf "%A" report
             logger.WriteLine "📊 Report:"
