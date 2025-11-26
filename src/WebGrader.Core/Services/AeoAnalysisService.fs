@@ -50,7 +50,6 @@ Reviews: {searchData.Sentiment.ReviewSentiment.Length} results
 
 Please provide a JSON response with the following structure:
 {{
-  "overallScore": 75,
   "brandRecognitionScore": 15,
   "marketScore": 8,
   "sentimentScore": 35,
@@ -152,10 +151,12 @@ Return ONLY valid JSON, no additional text."""
                         Product = product
                         Industry = industry
                         Score = {
-                            Overall = json.GetProperty("overallScore").GetInt32()
                             BrandRecognition = json.GetProperty("brandRecognitionScore").GetInt32()
                             MarketScore = json.GetProperty("marketScore").GetInt32()
                             Sentiment = json.GetProperty("sentimentScore").GetInt32()
+                            Overall = json.GetProperty("brandRecognitionScore").GetInt32() 
+                                      + json.GetProperty("marketScore").GetInt32() 
+                                      + json.GetProperty("sentimentScore").GetInt32()
                         }
                         Competitors = 
                             json.GetProperty("competitors").EnumerateArray()

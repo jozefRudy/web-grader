@@ -15,6 +15,7 @@ open Api.LLMClient
 open Config.Google
 open Config.LiteLLM
 open Services.AeoAnalysisService
+open System.Threading
 
 type Client(uri: string) =
     let handler = new HttpClientHandler()
@@ -120,7 +121,6 @@ type ApiTests(logger: ITestOutputHelper) =
             let googleHttpClient = Client "https://www.googleapis.com/customsearch/v1"
             let googleClient = GoogleClient(googleHttpClient.Client, googleConfig)
 
-            // Setup LLM Client (mock for now, not used in GatherSearchData)
             let llmConfig = LiteLLMConfig()
             llmConfig.Uri <- "http://localhost:4000"
             llmConfig.Model <- "gpt-5-mini"
@@ -128,21 +128,18 @@ type ApiTests(logger: ITestOutputHelper) =
             let llmHttpClient = Client llmConfig.Uri
             let llmClient = LLMClient(llmHttpClient.Client, Options.Create llmConfig)
 
-            // Create service
             let service = AeoAnalysisService(googleClient, llmClient)
 
-            let! searchData =
-                service.GatherSearchData(
-                    "Martus Solutions",
-                    "United States",
-                    "CRM Software",
-                    "B2B SaaS",
-                    CancellationToken.None
-                )
+            let request =
+                "Martus Solutions", "United States", "CRM Software", "B2B SaaS", CancellationToken.None
 
-            test <@ searchData.BrandRecognition.BrandMentions.Length >= 0 @>
-            test <@ searchData.Competition.TopCompanies.Length >= 0 @>
-            test <@ searchData.Sentiment.Reddit.Length >= 0 @>
+            let! report = service.GenerateReport request
+
+            let responseStr = sprintf "%A" report
+            logger.WriteLine "📊 Report:"
+            logger.WriteLine responseStr
+            ()
+
         }
         |> TaskResult.teeError (fun x ->
             logger.WriteLine $"\n❌ Test failed: {x.Message}"
