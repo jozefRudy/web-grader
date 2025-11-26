@@ -14,9 +14,11 @@
     <!-- Order matters in F#! -->
     <Compile Include="Utils.fs" />
     <Compile Include="Config/GoogleConfig.fs" />
+    <Compile Include="Config/LiteLLMConfig.fs" />
     <Compile Include="Api/LoggingHandler.fs" />
     <Compile Include="Extensions/ApiExtension.fs" />
     <Compile Include="Api/GoogleClient.fs" />
+    <Compile Include="Api/LLMClient.fs" />
     <Compile Include="Library.fs" />
   </ItemGroup>
 
