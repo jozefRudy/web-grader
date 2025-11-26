@@ -92,7 +92,7 @@ type ApiTests(logger: ITestOutputHelper) =
         taskResult {
             // Arrange - hardcoded config (not secrets)
             let litellmUri = "http://localhost:4000"
-            let model = "gpt-4"
+            let model = "gpt-5-mini"
 
             logger.WriteLine $"✅ Testing LiteLLM GetModels"
 
@@ -135,7 +135,7 @@ type ApiTests(logger: ITestOutputHelper) =
             let googleConfig = GoogleConfig()
             googleConfig.ApiKey <- apiKey
             googleConfig.SearchEngineId <- searchEngineId
-            
+
             let googleHttpClient = Client "https://www.googleapis.com/customsearch/v1"
             let googleClient = GoogleClient(googleHttpClient.Client, googleConfig)
 
@@ -143,7 +143,7 @@ type ApiTests(logger: ITestOutputHelper) =
             let llmConfig = LiteLLMConfig()
             llmConfig.Uri <- "http://localhost:4000"
             llmConfig.Model <- "gpt-4o-mini"
-            
+
             let llmHttpClient = Client "http://localhost:4000"
             let llmClient = LLMClient(llmHttpClient.Client, Options.Create llmConfig)
 
@@ -152,7 +152,8 @@ type ApiTests(logger: ITestOutputHelper) =
 
             // Act
             logger.WriteLine "\n🔍 Executing search queries..."
-            let! searchData = 
+
+            let! searchData =
                 service.GatherSearchData(
                     "Martus Solutions",
                     "United States",
@@ -191,10 +192,10 @@ type ApiTests(logger: ITestOutputHelper) =
             test <@ searchData.BrandRecognition.BrandMentions.Length >= 0 @>
             test <@ searchData.Competition.TopCompanies.Length >= 0 @>
             test <@ searchData.Sentiment.Reddit.Length >= 0 @>
-            
+
             logger.WriteLine "\n✅ All search queries executed successfully!"
         }
-        |> TaskResult.teeError (fun x -> 
+        |> TaskResult.teeError (fun x ->
             logger.WriteLine $"\n❌ Test failed: {x.Message}"
             Assert.Fail x.Message
         )
