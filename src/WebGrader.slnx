@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="WebGrader.Api/WebGrader.Api.fsproj" />
+  <Project Path="WebGrader.Core/WebGrader.Core.fsproj" />
+  <Project Path="WebGrader.Tests/WebGrader.Tests.fsproj" />
+</Solution>
