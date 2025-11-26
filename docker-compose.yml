@@ -1,4 +1,37 @@
 services:
+  api:
+    build:
+      context: ./src
+      dockerfile: WebGrader.Api/Dockerfile
+    user: "1654"
+    restart: unless-stopped
+
+    environment:
+      Logging__LogLevel__Default: "Information"
+      Logging__LogLevel__Microsoft: "Warning"
+      Logging__LogLevel__Microsoft.AspNetCore: "Warning"
+      Logging__LogLevel__Microsoft.Hosting.Lifetime: "Information"
+      Logging__LogLevel__System.Net.Http.HttpClient: "Warning"
+      Logging__LogLevel__Polly: "Warning"
+
+      Logging__Console__LogLevel__Default: "Information"
+      Logging__Console__LogLevel__Microsoft: "Warning"
+      Logging__Console__LogLevel__Microsoft.AspNetCore: "Warning"
+      Logging__Console__LogLevel__Microsoft.Hosting.Lifetime: "Information"
+      Logging__Console__LogLevel__System.Net.Http.HttpClient: "Warning"
+      Logging__Console__LogLevel__Polly: "Warning"
+      Logging__Console__FormatterName: "json"
+      Logging__Console__FormatterOptions__SingleLine: "true"
+      Logging__Console__FormatterOptions__IncludeScopes: "true"
+      AllowedHosts: "*"
+      Kestrel__Endpoints__Http__Url: "http://+:80"
+      Google__ApiKey: ${Google__ApiKey}
+      Google__SearchEngineId: ${Google__SearchEngineId}
+      LiteLLM__Uri: ${LITELLM_URI:-http://litellm:4000}
+      LiteLLM__Model: ${LITELLM_MODEL:-gpt-5-mini}
+    ports:
+      - "3000:80"
+
   litellm:
     image: litellm/litellm:v1.79.3-stable
     platform: linux/amd64

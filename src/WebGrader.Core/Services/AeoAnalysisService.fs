@@ -164,14 +164,22 @@ Return ONLY the JSON object starting with {{ and ending with }}."""
                         Location = location
                         Product = product
                         Industry = industry
-                        Score = {
-                            BrandRecognition = json.GetProperty("brandRecognitionScore").GetInt32()
-                            MarketScore = json.GetProperty("marketScore").GetInt32()
-                            Sentiment = json.GetProperty("sentimentScore").GetInt32()
-                            Overall = json.GetProperty("brandRecognitionScore").GetInt32() 
-                                      + json.GetProperty("marketScore").GetInt32() 
-                                      + json.GetProperty("sentimentScore").GetInt32()
-                        }
+                        Score = 
+                            let brandScore100 = json.GetProperty("brandRecognitionScore").GetInt32()
+                            let marketScore100 = json.GetProperty("marketScore").GetInt32()
+                            let sentimentScore100 = json.GetProperty("sentimentScore").GetInt32()
+                            
+                            // Normalize from 0-100 to target ranges
+                            let brandRecognition = (brandScore100 * 20) / 100  // 0-20
+                            let marketScore = (marketScore100 * 10) / 100      // 0-10
+                            let sentiment = (sentimentScore100 * 40) / 100     // 0-40
+                            
+                            {
+                                BrandRecognition = brandRecognition
+                                MarketScore = marketScore
+                                Sentiment = sentiment
+                                Overall = brandRecognition + marketScore + sentiment
+                            }
                         Competitors = 
                             json.GetProperty("competitors").EnumerateArray()
                             |> Seq.map (fun c -> {

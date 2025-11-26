@@ -41,8 +41,8 @@ type ApiTests(logger: ITestOutputHelper) =
     member this.``google search returns results``() =
         taskResult {
             // Arrange - require env vars to be set
-            let apiKey = TestHelpers.requireEnvVar "GOOGLE_API_KEY"
-            let searchEngineId = TestHelpers.requireEnvVar "GOOGLE_SEARCH_ENGINE_ID"
+            let apiKey = TestHelpers.requireEnvVar "Google__ApiKey"
+            let searchEngineId = TestHelpers.requireEnvVar "Google__SearchEngineId"
 
             logger.WriteLine $"✅ Testing Google Search with query: 'test query'"
 
@@ -110,8 +110,8 @@ type ApiTests(logger: ITestOutputHelper) =
     member this.``GatherSearchData executes all queries successfully``() =
         taskResult {
             // Arrange - require env vars to be set
-            let apiKey = TestHelpers.requireEnvVar "GOOGLE_API_KEY"
-            let searchEngineId = TestHelpers.requireEnvVar "GOOGLE_SEARCH_ENGINE_ID"
+            let apiKey = TestHelpers.requireEnvVar "Google__ApiKey"
+            let searchEngineId = TestHelpers.requireEnvVar "Google__SearchEngineId"
 
             // Setup Google Client
             let googleConfig = GoogleConfig()
