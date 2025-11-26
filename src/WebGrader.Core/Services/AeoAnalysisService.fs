@@ -79,7 +79,13 @@ Please provide a JSON response with the following structure:
   }},
   "sourceAnalysis": {{
     "totalSources": 47,
-    "topSources": [["reddit.com", 23], ["twitter.com", 18]],
+    "topSources": [
+      ["reddit.com", 23],
+      ["twitter.com", 18],
+      ["linkedin.com", 15],
+      ["g2.com", 12],
+      ["capterra.com", 9]
+    ],
     "sourceDiversity": 8
   }},
   "keyInsights": {{
@@ -90,7 +96,15 @@ Please provide a JSON response with the following structure:
   }}
 }}
 
-Return ONLY valid JSON, no additional text."""
+CRITICAL FORMATTING RULES - FOLLOW EXACTLY:
+1. Return ONLY valid JSON - no markdown code blocks, no explanatory text
+2. All scores must be integers between 0-100
+3. "topSources" MUST be an array of exactly 5 arrays
+4. Each inner array MUST have EXACTLY 2 elements: [string, number]
+   Example: [["reddit.com", 23], ["twitter.com", 18], ["linkedin.com", 15], ["g2.com", 12], ["capterra.com", 9]]
+5. Double-check your topSources format - it must match the example above
+
+Return ONLY the JSON object starting with {{ and ending with }}."""
     
     member this.GatherSearchData(companyName: string, location: string, product: string, industry: string, ct: CancellationToken) =
         taskResult {
