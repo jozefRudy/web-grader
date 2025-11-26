@@ -127,29 +127,6 @@ dotnet test
 - **Benefits**: Can extract insights from unstructured text, adapts to different industries
 - **Trade-off**: Non-deterministic, requires careful prompt engineering
 
-## Future Improvements
-
-**Short-term:**
-- Add caching layer (Redis) for Google search results
-- Implement retry logic with exponential backoff
-- Add loading progress indicators (% complete)
-- Store reports in database for historical comparison
-- Add export to PDF functionality
-
-**Medium-term:**
-- Background job processing (Hangfire/Azure Functions)
-- Competitor tracking over time (trend analysis)
-- Multiple LLM providers with fallback (OpenAI → Anthropic → local)
-- User authentication and report history
-- Batch processing for multiple companies
-
-**Long-term:**
-- Real-time monitoring and alerts
-- Custom scoring weights per industry
-- Integration with actual AEO tools APIs
-- Machine learning for score prediction
-- Multi-language support
-
 ## Project Structure
 
 ```
