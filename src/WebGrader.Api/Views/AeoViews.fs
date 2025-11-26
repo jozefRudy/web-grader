@@ -152,7 +152,7 @@ let reportFragment (report: AeoReport) =
             div [ _class "mb-8" ] [
                 h3 [ _class "text-xl font-bold mb-4 text-purple-700" ] [ str "Source Analysis" ]
                 div [ _class "bg-purple-50 p-4 rounded-lg" ] [
-                    div [ _class "grid grid-cols-2 md:grid-cols-3 gap-4 mb-4" ] [
+                    div [ _class "grid grid-cols-2 gap-4 mb-6" ] [
                         div [ _class "text-center" ] [
                             div [ _class "text-2xl font-bold text-purple-600" ] [ str (string report.SourceAnalysis.TotalSources) ]
                             div [ _class "text-sm text-gray-600" ] [ str "Total Sources" ]
@@ -160,9 +160,6 @@ let reportFragment (report: AeoReport) =
                         div [ _class "text-center" ] [
                             div [ _class "text-2xl font-bold text-purple-600" ] [ str $"{report.SourceAnalysis.SourceDiversity}/10" ]
                             div [ _class "text-sm text-gray-600" ] [ str "Source Diversity" ]
-                        ]
-                        div [ _class "text-center md:col-span-1" ] [
-                            div [ _class "text-sm text-gray-600" ] [ str "Top Sources" ]
                         ]
                     ]
 
