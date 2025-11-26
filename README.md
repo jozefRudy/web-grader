@@ -5,6 +5,7 @@ A proof-of-concept tool for Answer Engine Optimization (AEO) analysis that evalu
 ## Overview
 
 This application generates comprehensive AEO reports by:
+
 1. **Gathering real-time data** via Google Custom Search API (11 parallel queries covering brand recognition, market competition, and sentiment)
 2. **AI-powered analysis** using LLM to synthesize search results into actionable insights
 3. **Server-rendered UI** with HTMX for fast, interactive form submission without JavaScript frameworks
@@ -19,9 +20,11 @@ This application generates comprehensive AEO reports by:
 ## Screenshots
 
 ### Input Form
+
 ![Input Form](input_form.png)
 
 ### Example Report
+
 ![Example Report](example.png)
 
 For a detailed example of the generated report, see [example.pdf](example.pdf).
@@ -40,6 +43,7 @@ export OPENAI_API_KEY="your_openai_api_key"
 ```
 
 **Fish shell:**
+
 ```bash
 set -x Google__ApiKey "your_google_api_key"
 set -x Google__SearchEngineId "your_search_engine_id"
@@ -108,24 +112,55 @@ dotnet test
 ## Architecture Decisions
 
 ### Server-Rendered with HTMX
+
 - **Why**: Fast development, minimal JavaScript, progressive enhancement
 - **Benefits**: Simple deployment, works without client-side frameworks, excellent performance
 - **Trade-off**: Less interactive than SPA, but sufficient for form-submit-report workflow
 
 ### F# with ASP.NET Core
+
 - **Why**: Type safety, functional composition, excellent for data pipelines
 - **Benefits**: Strong domain modeling, railway-oriented programming with `Result`, clear data flow
 - **Trade-off**: Less common than C#, smaller ecosystem
 
 ### Parallel Google Queries
+
 - **Why**: Faster data gathering (11 queries in ~2 batches vs sequential)
 - **Benefits**: Reduces total request time from ~11s to ~2-3s
 - **Trade-off**: Higher API quota consumption
 
 ### LLM for Analysis
+
 - **Why**: Semantic understanding of search results, flexible output formatting
 - **Benefits**: Can extract insights from unstructured text, adapts to different industries
 - **Trade-off**: Non-deterministic, requires careful prompt engineering
+
+## Known Limitations
+
+**Architecture:**
+
+- Synchronous request/response model - form submission blocks for 30-60 seconds during analysis
+- No job queue or background processing - requests are coupled to HTTP lifecycle
+
+**LLM Integration:**
+
+- Single LLM provider
+- No retry logic if LLM returns malformed JSON
+- Limited schema validation before parsing
+- Single LLM failure causes entire analysis to fail
+
+**Production Readiness:**
+
+- No database for storing historical reports
+- Client-side interactivity limited (server-rendered HTMX vs frontend framework)
+- No rate limiting or quota management for multiple concurrent users
+
+**Data Quality:**
+
+- Limited to top 10 Google results per query (API limitation)
+- No caching - repeated queries for same company
+- LLM-generated scores and metrics (e.g., competitor mentions, total mentions) are estimates and hallucinations rather than actual counts from search results
+- No programmatic extraction of competitor names or mention counts from search data
 
 ## Project Structure
 
