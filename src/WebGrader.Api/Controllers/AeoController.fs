@@ -5,6 +5,9 @@ open Giraffe.ViewEngine
 open Models.AeoModels
 open Views.AeoViews
 open System
+open System.Threading
+open System.Threading.Tasks
+open System.Threading
 
 [<Route("/")>]
 type AeoController() =
@@ -21,10 +24,12 @@ type AeoController() =
             [<FromForm>] companyName: string,
             [<FromForm>] location: string,
             [<FromForm>] product: string,
-            [<FromForm>] industry: string
+            [<FromForm>] industry: string,
+            ct: CancellationToken
         ) =
         task {
             try
+                do! Task.Delay(5000, ct)
                 // TODO: Call AeoService for real analysis
                 // For now, return comprehensive mock report with fake data
                 let report = {
@@ -75,12 +80,13 @@ type AeoController() =
                     }
                     MarketCompetitionDetails = {
                         TotalMentions = 1247
-                        CompetitorMentions = Map [
-                            "Competitor A", 234
-                            "Competitor B", 156
-                            "Competitor C", 98
-                            "Competitor D", 67
-                        ]
+                        CompetitorMentions =
+                            Map [
+                                "Competitor A", 234
+                                "Competitor B", 156
+                                "Competitor C", 98
+                                "Competitor D", 67
+                            ]
                         CommonComparisonTopics = [
                             "pricing"
                             "features"

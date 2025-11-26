@@ -9,7 +9,10 @@ let layout (content: XmlNode list) =
             meta [ _charset "utf-8" ]
             meta [ _name "viewport"; _content "width=device-width, initial-scale=1" ]
             title [] [ str "AEO Brand Analyzer" ]
-            link [ _href "https://cdn.jsdelivr.net/npm/daisyui@4/dist/full.css"; _rel "stylesheet" ]
+            link [
+                _href "https://cdn.jsdelivr.net/npm/daisyui@4/dist/full.css"
+                _rel "stylesheet"
+            ]
             script [ _src "https://cdn.tailwindcss.com" ] []
             script [ _src "https://unpkg.com/htmx.org@1.9.10" ] []
             style [] [
@@ -20,23 +23,31 @@ let layout (content: XmlNode list) =
                 .htmx-request .htmx-indicator {
                     display: block;
                 }
+                .htmx-request.htmx-request {
+                    pointer-events: none;
+                    opacity: 0.6;
+                }
+                .htmx-request #btn-spinner {
+                    display: inline-block !important;
+                }
                 """
             ]
         ]
         body [ _class "min-h-screen bg-base-200 text-base-content" ] content
     ]
 
-let formView() =
+let formView () =
     layout [
         div [ _class "container mx-auto max-w-4xl p-8" ] [
             div [ _class "card bg-base-100 shadow-xl" ] [
                 div [ _class "card-body" ] [
                     h1 [ _class "card-title text-3xl mb-6" ] [ str "AEO Brand Analysis" ]
-                    
-                    form [ 
+
+                    form [
                         attr "hx-post" "/api/analyze"
                         attr "hx-target" "#report"
                         attr "hx-indicator" "#loading"
+                        attr "hx-disabled-elt" "#analyze-btn"
                         _class "space-y-4"
                     ] [
                         // Company Name
@@ -44,7 +55,7 @@ let formView() =
                             label [ _class "label" ] [
                                 span [ _class "label-text font-semibold" ] [ str "Company Name *" ]
                             ]
-                            input [ 
+                            input [
                                 _type "text"
                                 _name "companyName"
                                 _required
@@ -52,13 +63,11 @@ let formView() =
                                 _class "input input-bordered w-full"
                             ]
                         ]
-                        
+
                         // Location
                         div [ _class "form-control" ] [
-                            label [ _class "label" ] [
-                                span [ _class "label-text font-semibold" ] [ str "Location *" ]
-                            ]
-                            input [ 
+                            label [ _class "label" ] [ span [ _class "label-text font-semibold" ] [ str "Location *" ] ]
+                            input [
                                 _type "text"
                                 _name "location"
                                 _required
@@ -66,13 +75,13 @@ let formView() =
                                 _class "input input-bordered w-full"
                             ]
                         ]
-                        
+
                         // Product/Service
                         div [ _class "form-control" ] [
                             label [ _class "label" ] [
                                 span [ _class "label-text font-semibold" ] [ str "Product/Service *" ]
                             ]
-                            input [ 
+                            input [
                                 _type "text"
                                 _name "product"
                                 _required
@@ -80,13 +89,11 @@ let formView() =
                                 _class "input input-bordered w-full"
                             ]
                         ]
-                        
+
                         // Industry
                         div [ _class "form-control" ] [
-                            label [ _class "label" ] [
-                                span [ _class "label-text font-semibold" ] [ str "Industry *" ]
-                            ]
-                            input [ 
+                            label [ _class "label" ] [ span [ _class "label-text font-semibold" ] [ str "Industry *" ] ]
+                            input [
                                 _type "text"
                                 _name "industry"
                                 _required
@@ -94,21 +101,19 @@ let formView() =
                                 _class "input input-bordered w-full"
                             ]
                         ]
-                        
-                        button [ _type "submit"; _class "btn btn-primary w-full mt-6" ] [
+
+                        button [
+                            _type "submit"
+                            _id "analyze-btn"
+                            _class "btn btn-primary w-full mt-6"
+                        ] [
+                            span [ _id "btn-spinner"; _class "loading loading-spinner loading-sm mr-2"; _style "display: none" ] []
                             str "Analyze Brand"
-                        ]
-                        
-                        div [ _id "loading"; _class "htmx-indicator mt-4" ] [
-                            div [ _class "alert alert-info" ] [
-                                span [ _class "loading loading-spinner" ] []
-                                str " Analyzing... This may take 30-60 seconds"
-                            ]
                         ]
                     ]
                 ]
             ]
-            
+
             div [ _id "report"; _class "mt-8" ] []
         ]
     ]
@@ -116,9 +121,7 @@ let formView() =
 let reportFragment (report: AeoReport) =
     div [ _class "card bg-base-100 shadow-xl" ] [
         div [ _class "card-body" ] [
-            h2 [ _class "card-title text-2xl mb-4" ] [
-                str $"AEO Analysis: {report.CompanyName}"
-            ]
+            h2 [ _class "card-title text-2xl mb-4" ] [ str $"AEO Analysis: {report.CompanyName}" ]
 
             div [ _class "text-sm text-gray-600 mb-6" ] [
                 str $"Location: {report.Location} | Product: {report.Product} | Industry: {report.Industry}"
@@ -154,11 +157,15 @@ let reportFragment (report: AeoReport) =
                 div [ _class "bg-purple-50 p-4 rounded-lg" ] [
                     div [ _class "grid grid-cols-2 gap-4 mb-6" ] [
                         div [ _class "text-center" ] [
-                            div [ _class "text-2xl font-bold text-purple-600" ] [ str (string report.SourceAnalysis.TotalSources) ]
+                            div [ _class "text-2xl font-bold text-purple-600" ] [
+                                str (string report.SourceAnalysis.TotalSources)
+                            ]
                             div [ _class "text-sm text-gray-600" ] [ str "Total Sources" ]
                         ]
                         div [ _class "text-center" ] [
-                            div [ _class "text-2xl font-bold text-purple-600" ] [ str $"{report.SourceAnalysis.SourceDiversity}/10" ]
+                            div [ _class "text-2xl font-bold text-purple-600" ] [
+                                str $"{report.SourceAnalysis.SourceDiversity}/10"
+                            ]
                             div [ _class "text-sm text-gray-600" ] [ str "Source Diversity" ]
                         ]
                     ]
@@ -180,19 +187,27 @@ let reportFragment (report: AeoReport) =
                 div [ _class "bg-green-50 p-4 rounded-lg" ] [
                     div [ _class "grid grid-cols-2 md:grid-cols-4 gap-4" ] [
                         div [ _class "text-center" ] [
-                            div [ _class "text-2xl font-bold text-green-600" ] [ str (string report.BrandRecognitionDetails.RecognitionScore) ]
+                            div [ _class "text-2xl font-bold text-green-600" ] [
+                                str (string report.BrandRecognitionDetails.RecognitionScore)
+                            ]
                             div [ _class "text-sm text-gray-600" ] [ str "Recognition Score" ]
                         ]
                         div [ _class "text-center" ] [
-                            div [ _class "text-lg font-semibold text-green-600" ] [ str report.BrandRecognitionDetails.MarketPosition ]
+                            div [ _class "text-lg font-semibold text-green-600" ] [
+                                str report.BrandRecognitionDetails.MarketPosition
+                            ]
                             div [ _class "text-sm text-gray-600" ] [ str "Market Position" ]
                         ]
                         div [ _class "text-center" ] [
-                            div [ _class "text-2xl font-bold text-green-600" ] [ str $"{report.BrandRecognitionDetails.ConfidenceLevel}%%" ]
+                            div [ _class "text-2xl font-bold text-green-600" ] [
+                                str $"{report.BrandRecognitionDetails.ConfidenceLevel}%%"
+                            ]
                             div [ _class "text-sm text-gray-600" ] [ str "Confidence Level" ]
                         ]
                         div [ _class "text-center" ] [
-                            div [ _class "text-2xl font-bold text-green-600" ] [ str $"{report.BrandRecognitionDetails.SourceDiversity}/10" ]
+                            div [ _class "text-2xl font-bold text-green-600" ] [
+                                str $"{report.BrandRecognitionDetails.SourceDiversity}/10"
+                            ]
                             div [ _class "text-sm text-gray-600" ] [ str "Source Diversity" ]
                         ]
                     ]
@@ -214,7 +229,8 @@ let reportFragment (report: AeoReport) =
                         div [ _class "mb-4" ] [
                             h4 [ _class "font-semibold mb-2" ] [ str "Competitor Mentions:" ]
                             div [ _class "grid grid-cols-2 md:grid-cols-3 gap-2" ] [
-                                for (competitor, mentions) in Map.toSeq report.MarketCompetitionDetails.CompetitorMentions do
+                                for (competitor, mentions) in
+                                    Map.toSeq report.MarketCompetitionDetails.CompetitorMentions do
                                     div [ _class "bg-white p-2 rounded shadow-sm" ] [
                                         str $"{competitor}: {mentions} mentions"
                                     ]
@@ -322,18 +338,10 @@ let reportFragment (report: AeoReport) =
 
             // Print button
             div [ _class "flex justify-end gap-4" ] [
-                button [
-                    _class "btn btn-secondary"
-                    _onclick "window.print()"
-                ] [ str "Print Report" ]
+                button [ _class "btn btn-secondary"; _onclick "window.print()" ] [ str "Print Report" ]
             ]
         ]
     ]
 
 let errorFragment (message: string) =
-    div [ _class "alert alert-error shadow-lg" ] [
-        div [] [
-            str "Error: "
-            str message
-        ]
-    ]
+    div [ _class "alert alert-error shadow-lg" ] [ div [] [ str "Error: "; str message ] ]
