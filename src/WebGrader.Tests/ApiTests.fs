@@ -29,6 +29,11 @@ module TestHelpers =
         |> Option.ofObj
         |> Option.defaultWith (fun () -> failwith $"{name} environment variable is required but not set")
 
+let llmConfig = LiteLLMConfig()
+llmConfig.Uri <- "http://localhost:4000"
+llmConfig.Model <- "gpt-5-mini"
+
+
 type ApiTests(logger: ITestOutputHelper) =
 
     [<Fact>]
@@ -64,16 +69,8 @@ type ApiTests(logger: ITestOutputHelper) =
     [<Fact>]
     member this.``llm chat returns response``() =
         taskResult {
-            // Arrange - hardcoded config (not secrets)
-            let litellmUri = "http://localhost:4000"
-            let model = "gpt-5-mini"
-
-            let config = LiteLLMConfig()
-            config.Uri <- litellmUri
-            config.Model <- model
-
-            let options = Options.Create config
-            let client = Client litellmUri
+            let options = Options.Create llmConfig
+            let client = Client llmConfig.Uri
             let llmClient = LLMClient(client.Client, options)
 
             // Act
@@ -90,18 +87,8 @@ type ApiTests(logger: ITestOutputHelper) =
     [<Fact>]
     member this.``llm get models returns list``() =
         taskResult {
-            // Arrange - hardcoded config (not secrets)
-            let litellmUri = "http://localhost:4000"
-            let model = "gpt-5-mini"
-
-            logger.WriteLine $"✅ Testing LiteLLM GetModels"
-
-            let config = LiteLLMConfig()
-            config.Uri <- litellmUri
-            config.Model <- model
-
-            let options = Options.Create config
-            let client = Client litellmUri
+            let options = Options.Create llmConfig
+            let client = Client llmConfig.Uri
             let llmClient = LLMClient(client.Client, options)
 
             // Act
@@ -125,12 +112,6 @@ type ApiTests(logger: ITestOutputHelper) =
             let apiKey = TestHelpers.requireEnvVar "GOOGLE_API_KEY"
             let searchEngineId = TestHelpers.requireEnvVar "GOOGLE_SEARCH_ENGINE_ID"
 
-            logger.WriteLine "✅ Testing GatherSearchData with real Google API"
-            logger.WriteLine "Company: Martus Solutions"
-            logger.WriteLine "Location: United States"
-            logger.WriteLine "Product: CRM Software"
-            logger.WriteLine "Industry: B2B SaaS"
-
             // Setup Google Client
             let googleConfig = GoogleConfig()
             googleConfig.ApiKey <- apiKey
@@ -142,16 +123,13 @@ type ApiTests(logger: ITestOutputHelper) =
             // Setup LLM Client (mock for now, not used in GatherSearchData)
             let llmConfig = LiteLLMConfig()
             llmConfig.Uri <- "http://localhost:4000"
-            llmConfig.Model <- "gpt-4o-mini"
+            llmConfig.Model <- "gpt-5-mini"
 
-            let llmHttpClient = Client "http://localhost:4000"
+            let llmHttpClient = Client llmConfig.Uri
             let llmClient = LLMClient(llmHttpClient.Client, Options.Create llmConfig)
 
             // Create service
             let service = AeoAnalysisService(googleClient, llmClient)
-
-            // Act
-            logger.WriteLine "\n🔍 Executing search queries..."
 
             let! searchData =
                 service.GatherSearchData(
@@ -162,38 +140,9 @@ type ApiTests(logger: ITestOutputHelper) =
                     CancellationToken.None
                 )
 
-            // Assert and Log Results
-            logger.WriteLine "\n📊 Brand Recognition Results:"
-            logger.WriteLine $"  Brand Mentions: {searchData.BrandRecognition.BrandMentions.Length} results"
-            logger.WriteLine $"  Brand + Industry: {searchData.BrandRecognition.BrandIndustry.Length} results"
-            logger.WriteLine $"  Best Product: {searchData.BrandRecognition.BestProduct.Length} results"
-            logger.WriteLine $"  Reviews: {searchData.BrandRecognition.Reviews.Length} results"
-
-            logger.WriteLine "\n📊 Competition Results:"
-            logger.WriteLine $"  VS Competitors: {searchData.Competition.VsCompetitors.Length} results"
-            logger.WriteLine $"  Alternatives: {searchData.Competition.Alternatives.Length} results"
-            logger.WriteLine $"  Top Companies: {searchData.Competition.TopCompanies.Length} results"
-
-            logger.WriteLine "\n📊 Sentiment Results:"
-            logger.WriteLine $"  Review Sentiment: {searchData.Sentiment.ReviewSentiment.Length} results"
-            logger.WriteLine $"  Complaints: {searchData.Sentiment.Complaints.Length} results"
-            logger.WriteLine $"  Reddit: {searchData.Sentiment.Reddit.Length} results"
-            logger.WriteLine $"  Testimonials: {searchData.Sentiment.Testimonials.Length} results"
-
-            // Sample some results
-            if searchData.BrandRecognition.BrandMentions.Length > 0 then
-                logger.WriteLine "\n📌 Sample Brand Mention Result:"
-                let first = searchData.BrandRecognition.BrandMentions.[0]
-                logger.WriteLine $"  Title: {first.title}"
-                logger.WriteLine $"  Link: {first.link}"
-                logger.WriteLine $"  Snippet: {first.snippet}"
-
-            // Assertions
             test <@ searchData.BrandRecognition.BrandMentions.Length >= 0 @>
             test <@ searchData.Competition.TopCompanies.Length >= 0 @>
             test <@ searchData.Sentiment.Reddit.Length >= 0 @>
-
-            logger.WriteLine "\n✅ All search queries executed successfully!"
         }
         |> TaskResult.teeError (fun x ->
             logger.WriteLine $"\n❌ Test failed: {x.Message}"
