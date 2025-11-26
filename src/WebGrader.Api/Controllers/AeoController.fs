@@ -4,13 +4,12 @@ open Microsoft.AspNetCore.Mvc
 open Giraffe.ViewEngine
 open Models.AeoModels
 open Views.AeoViews
+open Services.AeoAnalysisService
 open System
-open System.Threading
-open System.Threading.Tasks
 open System.Threading
 
 [<Route("/")>]
-type AeoController() =
+type AeoController(aeoService: AeoAnalysisService) =
     inherit Controller()
 
     [<HttpGet>]
@@ -29,6 +28,23 @@ type AeoController() =
         ) =
         task {
             try
+                // Call the AeoAnalysisService to generate the report
+                let! result = aeoService.GenerateReport(companyName, location, product, industry, ct)
+                
+                match result with
+                | Ok report ->
+                    let html = reportFragment report |> RenderView.AsString.htmlNode
+                    return this.Content(html, "text/html")
+                | Error ex ->
+                    let html = errorFragment ex.Message |> RenderView.AsString.htmlNode
+                    return this.Content(html, "text/html")
+            with ex ->
+                let html = errorFragment ex.Message |> RenderView.AsString.htmlNode
+                return this.Content(html, "text/html")
+        }
+                
+                (*
+                // OLD MOCK DATA - Keep for reference
                 let report = {
                     CompanyName = companyName
                     Location = location
@@ -155,10 +171,4 @@ type AeoController() =
                         ]
                     }
                 }
-
-                let html = reportFragment report |> RenderView.AsString.htmlNode
-                return this.Content(html, "text/html")
-            with ex ->
-                let html = errorFragment ex.Message |> RenderView.AsString.htmlNode
-                return this.Content(html, "text/html")
-        }
+                *)

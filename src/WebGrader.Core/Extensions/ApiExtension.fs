@@ -6,6 +6,7 @@ open System.Net.Http
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Http.Resilience
 open Microsoft.Extensions.Logging
+open Microsoft.Extensions.Configuration
 open Api.LoggingHandler
 
 let configureStandardTimeouts (baseTimeout: TimeSpan) (options: HttpStandardResilienceOptions) =
@@ -51,4 +52,21 @@ type IServiceCollection with
             match uri with
             | Some uri -> c.BaseAddress <- Uri uri
             | None -> ()
+        )
+    
+    member this.AddGoogleClient(config: IConfiguration) =
+        this.AddConfigurableResilientClient<Api.GoogleClient.GoogleClient>(
+            (fun sp c ->
+                c.BaseAddress <- Uri "https://www.googleapis.com/customsearch/v1"
+            ),
+            configureResilience = (fun options -> configureStandardTimeouts (TimeSpan.FromSeconds 30.0) options)
+        )
+    
+    member this.AddLiteLLMClient(config: IConfiguration) =
+        let baseUrl = config.["BaseUrl"]
+        this.AddConfigurableResilientClient<Api.LLMClient.LLMClient>(
+            (fun sp c ->
+                c.BaseAddress <- Uri baseUrl
+            ),
+            configureResilience = (fun options -> configureStandardTimeouts (TimeSpan.FromSeconds 60.0) options)
         )
