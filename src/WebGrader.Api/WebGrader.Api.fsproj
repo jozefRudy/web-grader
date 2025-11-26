@@ -12,7 +12,6 @@
     <Compile Include="Views/AeoViews.fs" />
     <Compile Include="Controllers/AeoController.fs" />
     <Compile Include="WeatherForecast.fs" />
-    <Compile Include="Controllers/WeatherForecastController.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
