@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
+
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <WarningsAsErrors>FS0025</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

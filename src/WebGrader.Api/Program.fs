@@ -1,5 +1,7 @@
 namespace WebGrader.Api
+
 #nowarn "20"
+
 open System
 open System.Collections.Generic
 open System.IO
@@ -20,15 +22,11 @@ module Program =
     [<EntryPoint>]
     let main args =
 
-        let builder = WebApplication.CreateBuilder(args)
-
+        let builder = WebApplication.CreateBuilder args
         builder.Services.AddControllers()
 
         let app = builder.Build()
 
-        app.UseHttpsRedirection()
-
-        app.UseAuthorization()
         app.MapControllers()
 
         app.Run()
